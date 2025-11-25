@@ -1,0 +1,398 @@
+<!-- Chosen Palette: Azul estratégico (confianza), Verde (adopción), Rojo/Naranja (brechas críticas) y Púrpuras/Grises (neutralidad) -->
+<!-- Application Structure Plan: Un dashboard de una sola página con desplazamiento vertical. La estructura refleja una propuesta de financiación: 1. Resumen Ejecutivo (KPIs de alcance y brechas críticas), 2. 'La Petición' (Justificación de Inversión/Barreras), 3. 'Prueba de Valor' (Plan de Acción/Victorias Rápidas). Este flujo narrativo está diseñado para guiar al financiador lógicamente desde el estado actual y el problema (Brechas), a la inversión requerida (Barreras), y finalmente a la prueba de que el programa (RIL) entrega resultados (Victorias Rápidas). -->
+<!-- Visualization & Content Choices: Info (ej. 90% sin plan) -> Meta (Mostrar brechas estructurales) -> Viz (Gráfico de Barras Horizontales) -> Interacción (Tooltip al pasar el cursor) -> Justificación (Compara claramente los altos porcentajes de déficit) -> Librería (Chart.js). Info (Desafíos de presupuesto) -> Meta (Mostrar 'La Petición') -> Viz (Gráfico de Barras Verticales) -> Justificación (Clasifica presupuesto/equipo como necesidades principales) -> Librería (Chart.js). Info (Victorias Rápidas) -> Meta (Probar el valor de RIL) -> Viz (Tabla HTML estilizada) -> Justificación (Resume resultados concretos y diversos) -> Librería (HTML/Tailwind). -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Estratégico RIL - Córdoba</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de Chart.js para gráficos interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <style>
+        .kpi-card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        .text-focus {
+            background-color: #fef3c7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Encabezado Fijo y Título -->
+    <header class="bg-blue-800 text-white shadow-lg sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">
+                Estado y Necesidades del Programa CIUDADES POR LA SEGURIDAD
+            </h1>
+            <div class="text-sm opacity-80 hidden md:block">
+                Agosto 2025 | Presentación a Financiadores
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal (Cuerpo del Dashboard) -->
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- Barra de Filtros (Simulación) -->
+        <div class="bg-white p-4 mb-8 rounded-xl shadow-md border-t-4 border-blue-600">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3">Filtros Globales (Simulados)</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <select class="p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <option>Cohorte: 2025</option>
+                </select>
+                <select class="p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <option>Tipo de Ciudad: Todas</option>
+                    <option>Población Grande</option>
+                    <option>Población Mediana</option>
+                </select>
+                <select class="p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <option>Región: Todas</option>
+                    <option>Región Norte</option>
+                    <option>Región Sur</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 1: RESUMEN EJECUTIVO Y COBERTURA -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-blue-500 pb-2">1. Resumen Ejecutivo: Cobertura y Brechas</h2>
+            <p class="mb-6 text-gray-600">Los siguientes indicadores clave (KPIs) demuestran el <span class="text-focus text-green-700 bg-green-100">alcance del programa</span> y la <span class="text-focus text-red-700 bg-red-100">necesidad estructural</span> de continuar la inversión.</p>
+
+            <!-- KPIs de Cobertura -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- KPI 1: Ciudades Participantes -->
+                <div class="kpi-card bg-white p-6 rounded-xl border-l-4 border-blue-600">
+                    <p class="text-sm font-medium text-gray-500">Ciudades Participantes (Edición 2025)</p>
+                    <p class="text-4xl font-extrabold text-blue-800 mt-1">91+</p>
+                    <p class="text-xs text-gray-400 mt-2">40 (Índice Seguridad) + 91 (Relevamiento Op.).</p>
+                </div>
+
+                <!-- KPI 2: Guardia Local Activa -->
+                <div class="kpi-card bg-white p-6 rounded-xl border-l-4 border-green-600">
+                    <p class="text-sm font-medium text-gray-500">Guardia Local Lanzada (Adopción)</p>
+                    <p class="text-4xl font-extrabold text-green-600 mt-1">132</p>
+                    <p class="text-xs text-gray-400 mt-2">Ciudades en toda la provincia con la Guardia Local activa.</p>
+                </div>
+
+                <!-- KPI 3: Brecha de Planificación (Punto Crítico) -->
+                <div class="kpi-card bg-white p-6 rounded-xl border-l-4 border-red-600">
+                    <p class="text-sm font-medium text-gray-500">Brecha Estratégica (Crítica)</p>
+                    <p class="text-4xl font-extrabold text-red-600 mt-1">90%</p>
+                    <p class="text-xs text-gray-400 mt-2">De los municipios <strong class="text-red-600">NO cuentan con un plan de seguridad</strong> formal.</p>
+                </div>
+
+                <!-- KPI 4: Dependencia Ciudadana -->
+                <div class="kpi-card bg-white p-6 rounded-xl border-l-4 border-purple-600">
+                    <p class="text-sm font-medium text-gray-500">Confianza Ciudadana (Guardia Local)</p>
+                    <p class="text-4xl font-extrabold text-purple-600 mt-1">35%</p>
+                    <p class="text-xs text-gray-400 mt-2">De los vecinos llaman principalmente a la Guardia Local (vs. Policía).</p>
+                </div>
+            </div>
+
+            <!-- Gráfico de Brechas -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">Brechas de Gestión (Justificación de la Asistencia Técnica RIL)</h3>
+                <p class="text-sm text-gray-500 mb-4">La falta de planificación formal y gestión de la información son los déficits más altos, demostrando la necesidad de la asistencia de RIL.</p>
+                <div class="chart-container">
+                    <canvas id="chartBrechas"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: JUSTIFICACIÓN DE INVERSIÓN Y DESAFÍOS -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-blue-500 pb-2">2. Desafíos Estructurales y Justificación de Inversión</h2>
+            <p class="mb-6 text-gray-600">Las principales barreras reportadas por los municipios se centran en la <span class="text-focus text-blue-700 bg-blue-100">falta de recursos</span> y la necesidad de una <span class="text-focus text-blue-700 bg-blue-100">mayor coordinación</span> a nivel provincial.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Gráfico de Desafíos de Implementación -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Top 5 Barreras que Requieren Inversión Provincial</h3>
+                    <p class="text-sm text-gray-500 mb-4">Más del 50% de las ciudades identifican el presupuesto y el equipamiento como sus principales desafíos.</p>
+                    <div class="chart-container">
+                        <canvas id="chartDesafios"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Prioridades de Coordinación -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Temáticas Prioritarias de Coordinación Provincia-Municipio</h3>
+                    <p class="text-sm text-gray-500 mb-4">La inversión provincial ofrece un retorno sinérgico, especialmente en recursos tecnológicos compartidos.</p>
+                    <div class="chart-container">
+                        <canvas id="chartCoordinacion"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: PLAN DE ACCIÓN Y RESULTADOS TANGIBLES -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-blue-500 pb-2">3. Plan de Acción y Resultados Tangibles</h2>
+            <p class="mb-6 text-gray-600">El programa RIL está generando <span class="text-focus text-green-700 bg-green-100">resultados inmediatos</span> (<em class="font-bold">Victorias Rápidas</em>) en aspectos críticos, mientras promueve cambios estructurales.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Hoja de Ruta Estratégica -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Hoja de Ruta Estratégica (Foco de RIL)</h3>
+                    <ul class="list-disc list-inside space-y-3 text-gray-600 ml-4">
+                        <li>
+                            <strong>Foco Normativo y de Gestión:</strong>
+                            <span class="block text-sm">Promover normativas modelo (ej. ordenanzas de Guardia Local) y fortalecer la articulación interinstitucional (Policía/Municipio).</span>
+                        </li>
+                        <li>
+                            <strong>Foco Operativo y Protocolos:</strong>
+                            <span class="block text-sm">Desarrollar protocolos estandarizados (Guardia, Monitoreo, Alerta) y continuar la capacitación del personal.</span>
+                        </li>
+                        <li>
+                            <strong>Foco de Transparencia y Participación:</strong>
+                            <span class="block text-sm">Impulsar la evaluación de políticas locales, la gestión de datos y la rendición de cuentas a la ciudadanía.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Incidentes Atendidos (Relevancia) -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-red-500">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+                        <span class="text-2xl mr-2 text-red-500">ℹ️</span>
+                        Relevancia Operativa: Incidentes Más Atendidos
+                    </h3>
+                    <p class="text-3xl font-bold text-red-600">Accidentes de tránsito: 51.66%</p>
+                    <p class="text-xl font-semibold text-gray-700 mt-2">Situaciones sospechosas: 45.05%</p>
+                    <p class="text-sm text-gray-500 mt-3">Las Guardias Locales responden a eventos de alta prioridad ciudadana, justificando la necesidad de equipamiento y protocolos claros.</p>
+                </div>
+            </div>
+
+            <!-- Victorias Rápidas -->
+            <div class="bg-white p-6 rounded-xl shadow-md mt-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">Resultados Concretos (Victorias Rápidas en Proceso)</h3>
+                <p class="text-sm text-gray-500 mb-4">Prueba del valor de RIL: resúmenes de "micro-aceleraciones" estratégicas actualmente en implementación en las ciudades.</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left table-auto">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-4 py-3 text-sm font-semibold text-gray-600">Tipo de Resultado Rápido</th>
+                                <th class="px-4 py-3 text-sm font-semibold text-gray-600">Ejemplos de Acción (Resumen del Informe)</th>
+                                <th class="px-4 py-3 text-sm font-semibold text-gray-600">Ciudades en Proceso (Ejemplos)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-blue-700">Digitalización y Procesos</td>
+                                <td class="px-4 py-3 text-gray-600">Digitalización del registro de la Guardia Local y/o Mapa del Delito.</td>
+                                <td class="px-4 py-3 text-sm text-gray-500">Alicia, Cnel. Moldes, Saldán, Brinkmann</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-green-700">Infraestructura y Sistemas</td>
+                                <td class="px-4 py-3 text-gray-600">Creación/mejora de Centro de Monitoreo o Sistema de Alertas.</td>
+                                <td class="px-4 py-3 text-sm text-gray-500">Almafuente, Brinkmann, Villa Yacanto, Sampacho</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-yellow-700">Marco Legal y Normativo</td>
+                                <td class="px-4 py-3 text-gray-600">Implementación de Código de Convivencia o Normativa de Guardia Urbana.</td>
+                                <td class="px-4 py-3 text-sm text-gray-500">Cruz del Eje, Dean Funes, San Antonio de Arredondo</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-purple-700">Coordinación</td>
+                                <td class="px-4 py-3 text-gray-600">Mesas intermunicipales para corredores seguros.</td>
+                                <td class="px-4 py-3 text-sm text-gray-500">Agua de Oro, Rio Segundo, Villa del Rosario</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-blue-800 text-white mt-12">
+        <div class="max-w-7xl mx-auto px-8 py-4 text-center text-sm opacity-70">
+            Informe del Programa Ciudades por la Seguridad (RIL) - Córdoba | Agosto 2025
+        </div>
+    </footer>
+
+    <script>
+        const data = {
+            brechas: {
+                labels: ['Sin Organismo de Producción de Conocimiento', 'Sin Plan de Seguridad', 'Sin Proyectos de Prevención Social'],
+                percentages: [98, 90, 63],
+                colors: ['#EF4444', '#F59E0B', '#EAB308']
+            },
+            desafios: {
+                labels: ['Presupuesto para sostener la Guardia', 'Equipamiento, vehículos y tecnología', 'Reclutamiento y capacitación', 'Coordinación con la Policía', 'Comunicación sobre el rol'],
+                percentages: [63.74, 56.04, 40.66, 32.97, 31.87],
+                backgroundColor: '#2563EB',
+            },
+            coordinacion: {
+                labels: ['Recursos tecnológicos compartidos (Rutas)', 'Patrullaje y despliegue coordinado', 'Intercambio de información y alertas', 'Capacitaciones y protocolos comunes'],
+                percentages: [66.29, 47.19, 41.57, 33.71],
+                backgroundColor: ['#2563EB', '#10B981', '#F59E0B', '#9333EA'],
+            }
+        };
+
+        function initCharts() {
+            const chartTooltip = {
+                callbacks: {
+                    label: (context) => {
+                        let label = context.dataset.label || context.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        // Determinar el valor a mostrar. Usar context.parsed si está disponible (para barras),
+                        // o context.formattedValue directamente (útil para dona/pie).
+                        let value = context.parsed.x || context.parsed.y || context.formattedValue;
+                        
+                        // Asegurarse de que el valor es numérico antes de llamar a toFixed
+                        if (typeof value === 'number') {
+                            label += `${value.toFixed(2)}%`;
+                        } else if (typeof value === 'string' && !isNaN(parseFloat(value))) {
+                            label += `${parseFloat(value).toFixed(2)}%`;
+                        } else {
+                            // En el caso de gráficos de dona/pie, el valor es el porcentaje del punto
+                            label += `${context.formattedValue}%`;
+                        }
+                        
+                        return label;
+                    }
+                }
+            };
+            
+            const chartOptionsBase = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: chartTooltip
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 10 }
+                        }
+                    },
+                    y: {
+                        grid: { color: '#E5E7EB' },
+                        ticks: {
+                            font: { size: 10 }
+                        }
+                    }
+                }
+            };
+
+            // --- Gráfico de Brechas ---
+            const ctxBrechas = document.getElementById('chartBrechas').getContext('2d');
+            new Chart(ctxBrechas, {
+                type: 'bar',
+                data: {
+                    labels: data.brechas.labels,
+                    datasets: [{
+                        label: 'Municipios con Brecha',
+                        data: data.brechas.percentages,
+                        backgroundColor: data.brechas.colors,
+                    }]
+                },
+                options: {
+                    ...chartOptionsBase,
+                    indexAxis: 'y',
+                    scales: {
+                        ...chartOptionsBase.scales,
+                        x: {
+                            ...chartOptionsBase.scales.x,
+                            max: 100,
+                            ticks: { callback: (value) => value + "%" }
+                        },
+                        y: {
+                            ...chartOptionsBase.scales.y,
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // --- Gráfico de Desafíos de Implementación ---
+            const ctxDesafios = document.getElementById('chartDesafios').getContext('2d');
+            new Chart(ctxDesafios, {
+                type: 'bar',
+                data: {
+                    labels: data.desafios.labels,
+                    datasets: [{
+                        label: 'Ciudades que lo consideran un Desafío',
+                        data: data.desafios.percentages,
+                        backgroundColor: data.desafios.backgroundColor,
+                    }]
+                },
+                options: {
+                    ...chartOptionsBase,
+                    scales: {
+                         ...chartOptionsBase.scales,
+                        y: {
+                             ...chartOptionsBase.scales.y,
+                            beginAtZero: true,
+                            ticks: { callback: (value) => value + "%" }
+                        }
+                    }
+                }
+            });
+
+            // --- Gráfico de Prioridades de Coordinación ---
+            const ctxCoordinacion = document.getElementById('chartCoordinacion').getContext('2d');
+            new Chart(ctxCoordinacion, {
+                type: 'doughnut',
+                data: {
+                    labels: data.coordinacion.labels,
+                    datasets: [{
+                        label: 'Prioridad de Coordinación',
+                        data: data.coordinacion.percentages,
+                        backgroundColor: data.coordinacion.backgroundColor,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 10 },
+                                boxWidth: 20
+                            }
+                        },
+                        tooltip: chartTooltip
+                    }
+                }
+            });
+        }
+
+        window.onload = initCharts;
+    </script>
+</body>
+</html>
